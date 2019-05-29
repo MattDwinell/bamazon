@@ -1,0 +1,26 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "required packages",
+  "main": "customer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattDwinell/bamazon.git"
+  },
+  "keywords": [
+    "sql"
+  ],
+  "author": "MatthewDwinell",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MattDwinell/bamazon/issues"
+  },
+  "homepage": "https://github.com/MattDwinell/bamazon#readme",
+  "dependencies": {
+    "inquirer": "^6.3.1",
+    "mysql": "^2.17.1"
+  }
+}
