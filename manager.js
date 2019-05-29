@@ -15,7 +15,6 @@ connectionStart();
 function connectionStart() {
     connection.connect(function (err) {
         if (err) throw err;
-        console.log("succesful connection");
         managerChoices();
     });
 }
@@ -83,6 +82,40 @@ function managerChoices() {
 
                 })
             })
+        } else if (query.managerChoice == 'add a new product'){
+            inq.prompt([{
+                type:'input', name: 'newProduct', message: 'input product name: '
+            }, {type:'input', name:'productDepartment', message: 'input product department: ' }, {
+                type:'input', name: 'initialStockQuantity', message: 'input initial stock of new product:'}, {type:'input', name:'initialPrice', message: 'input Initial price of item:'}
+        ]).then(function(ans){
+            parseFloat(ans.initialStockQuantity, ans.initialPrice);
+            if (ans.newProduct && ans.productDepartment && ans.initialStockQuantity && ans.initialPrice){
+                console.log("adding " + ans.newProduct + " to the database.");
+                connection.query(
+                    "INSERT INTO products SET ?",
+                    {
+                      product_name: ans.newProduct,
+                      department: ans.productDepartment,
+                     stock_quantity: ans.initialStockQuantity,
+                     price: ans.initialPrice
+                    },
+                    function(err, res) {
+                        if(err) throw err;
+                      console.log('product added! Returning to the main menu.');
+                      managerChoices();
+                     
+                    }
+                  );
+                
+            } else {
+                console.log("please fill in all input fields when creating a new product. returning to the main menu.");
+                managerChoices();
+            }
+        })
+
+        } else if  (query.managerChoice == 'quit'){
+            console.log("terminating application. goodbye.");
+            connection.end();
         }
     })
 }
