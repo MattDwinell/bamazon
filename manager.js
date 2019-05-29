@@ -1,6 +1,7 @@
 var sql = require('mysql');
 var inq = require('inquirer');
 var productsArray = [];
+var managerProduct;
 var connection = sql.createConnection({
     host: "localhost",
     port: 3306,
@@ -20,9 +21,9 @@ function connectionStart() {
 }
 function managerChoices() {
     inq.prompt([{
-        type: "list", name: "managerChoice", message: 'please choose an option', choices: ['view products for sale', 'view low inventory', 'add more inventory', 'add a new product']
+        type: "list", name: "managerChoice", message: 'please choose an option', choices: ['view products for sale', 'view low inventory', 'add more inventory', 'add a new product', 'quit']
     }]).then(function (query) {
-        if (query.managerChoice == 'view products for sale')  {
+        if (query.managerChoice == 'view products for sale') {
             connection.query("SELECT * FROM products", function (err, res) {
                 if (err) throw err;
                 productsArray = res;
@@ -41,13 +42,69 @@ function managerChoices() {
             connection.query("SELECT * FROM products WHERE stock_quantity < 10", function (err, res) {
                 if (err) throw err;
                 console.clear();
-                for (let i=0; i<res.length; i ++){
+                for (let i = 0; i < res.length; i++) {
                     console.log('id: ' + res[i].id, ' | name: ' + res[i].product_name, ' | price: $' + res[i].price, ' | department: ' + res[i].department + ' | stock remaining: ' + res[i].stock_quantity);
                     console.log('_______________________________________________________________');
                 }
                 managerChoices();
             })
 
+        } else if (query.managerChoice == 'add more inventory') {
+            inq.prompt([{
+                type: 'input', name: 'managerIDChoice', message: 'type the id of the product you would like to add more of'
+            }, {
+                type: 'input', name: 'managerQuantityChoice', message: 'how many units are being added to the inventory?'
+            }]).then(function (ans) {
+                var managerIDChoice = parseFloat(ans.managerIDChoice);
+                var managerQuantityChoice = parseFloat(ans.managerQuantityChoice);
+                connection.query("SELECT * FROM products", function (err, res) {
+                    if (err) throw err;
+                    productsArray = res;
+
+                    
+                        for (let i = 0; i < productsArray.length; i++) {
+                            if (productsArray[i].id == managerIDChoice) {
+                                managerProduct = productsArray[i];
+                            }
+                        }
+                        if (managerProduct) {
+
+                        console.log('adding ' + managerQuantityChoice + ' units to ' + managerProduct.product_name);
+                        managerProduct.stock_quantity += managerQuantityChoice;
+                        updateProductQuantity();
+
+
+
+                    } else {
+                        console.log('invalid id entered, please refer to inventory to look at all ids');
+                        managerChoices();
+                    }
+
+
+                })
+            })
         }
     })
+}
+function updateProductQuantity() {
+    console.clear();
+    console.log("Updating Database...\n");
+    var query = connection.query(
+        "UPDATE products SET ? WHERE ?",
+        [
+            {
+                stock_quantity: managerProduct.stock_quantity
+            },
+            {
+                id: managerProduct.id
+            }
+        ],
+        function (err, res) {
+            if (err) throw err;
+            console.log("Product has been succesfully updated. there are now " + managerProduct.stock_quantity + " units of " + managerProduct.product_name + "(s) in stock. Returning to Main Menu.");
+            managerChoices();
+
+        }
+    );
+
 }

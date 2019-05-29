@@ -94,6 +94,5 @@ function updateProduct() {
       }
     );
   
-    // logs the actual query being run
-    console.log(query.sql);
+  
   }
