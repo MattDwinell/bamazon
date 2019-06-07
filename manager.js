@@ -89,7 +89,7 @@ function managerChoices() {
                 type:'input', name: 'initialStockQuantity', message: 'input initial stock of new product:'}, {type:'input', name:'initialPrice', message: 'input Initial price of item:'}
         ]).then(function(ans){
             parseFloat(ans.initialStockQuantity, ans.initialPrice);
-            if (ans.newProduct && ans.productDepartment &&typeof  ans.initialStockQuantity == 'integer' && typeof ans.initialPrice == 'number'){
+            if (ans.newProduct && ans.productDepartment && ans.initialStockQuantity  && ans.initialPrice){
                 console.log("adding " + ans.newProduct + " to the database.");
                 connection.query(
                     "INSERT INTO products SET ?",
